@@ -14,7 +14,7 @@
 
 html,
 body {
-  background: radial-gradient(circle at 50% 0%, #0a1a10 0%, #050505 70%);
+  background: #000000;
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
