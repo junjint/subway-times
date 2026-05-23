@@ -69,7 +69,9 @@ export function LedText({
     // Always keep text on a single line - LED scroller boards don't wrap.
     // When the text doesn't fit, the marquee animation scrolls it.
     whiteSpace: "nowrap",
-    textShadow: `0 0 4px ${color}, 0 0 10px ${color}88`,
+    // Wider, brighter halo so the lit dots bloom into the surrounding
+    // black pixels - same effect as a real LED panel viewed in the dark.
+    textShadow: `0 0 5px ${color}, 0 0 14px ${color}cc, 0 0 24px ${color}55`,
     ["--marquee-distance" as string]: `${overflowPx}px`,
     ["--marquee-duration" as string]: `${duration}s`,
   };

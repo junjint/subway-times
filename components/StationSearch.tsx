@@ -152,7 +152,7 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <label className="block text-neutral-500 uppercase text-xs tracking-[0.2em] mb-1.5 font-medium">
+      <label className="block text-mta-gray uppercase text-xs tracking-[0.2em] mb-1.5 font-medium">
         Station
       </label>
       <div className="relative">
@@ -175,7 +175,7 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
             setOpen(true);
           }}
           onKeyDown={onKeyDown}
-          className="w-full bg-white border border-neutral-300 rounded-md px-4 py-3 text-neutral-900 text-base sm:text-lg placeholder:text-neutral-400 focus:outline-none focus:border-[#14271b] focus:ring-2 focus:ring-[#14271b]/25 shadow-sm"
+          className="w-full bg-black/60 border border-white/15 rounded-md px-4 py-3 text-white text-base sm:text-lg placeholder:text-mta-gray/70 focus:outline-none focus:border-[#2d553c] focus:ring-2 focus:ring-[#2d553c]/40"
           autoComplete="off"
           spellCheck={false}
         />
@@ -187,7 +187,7 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
               setQuery("");
               inputRef.current?.focus();
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 text-xs px-2 py-1 rounded"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-mta-gray hover:text-white text-xs px-2 py-1 rounded"
             aria-label="Clear search"
           >
             ✕
@@ -199,10 +199,10 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute z-30 left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto bg-white border border-neutral-200 rounded-md shadow-2xl"
+          className="absolute z-30 left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto bg-mta-panel border border-white/15 rounded-md shadow-2xl"
         >
           {results.length === 0 ? (
-            <li className="px-4 py-6 text-center text-neutral-400 text-sm">
+            <li className="px-4 py-6 text-center text-mta-gray text-sm">
               No matching stations.
             </li>
           ) : (
@@ -219,8 +219,8 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
                   handleSelect(s);
                 }}
                 className={clsx(
-                  "flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-neutral-100 last:border-b-0",
-                  i === highlight ? "bg-neutral-100" : "hover:bg-neutral-50",
+                  "flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-white/5 last:border-b-0",
+                  i === highlight ? "bg-white/10" : "hover:bg-white/5",
                 )}
               >
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -229,8 +229,8 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
                   ))}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-neutral-900 font-semibold truncate">{s.name}</div>
-                  <div className="text-neutral-500 text-xs uppercase tracking-wider truncate">
+                  <div className="text-white font-semibold truncate">{s.name}</div>
+                  <div className="text-mta-gray text-xs uppercase tracking-wider truncate">
                     {s.borough}
                     {s.line ? ` · ${s.line}` : ""}
                   </div>
@@ -238,7 +238,7 @@ export function StationSearch({ stations, selectedStationId, onSelect }: Props) 
                 {selectedStationId === s.gtfsStopId && (
                   <span
                     className="text-xs uppercase tracking-wider shrink-0 font-medium"
-                    style={{ color: "#14271b" }}
+                    style={{ color: "#7dd99c" }}
                   >
                     Selected
                   </span>

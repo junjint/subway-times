@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fafaf7",
+  themeColor: "#050505",
   width: "device-width",
   initialScale: 1,
 };
@@ -40,7 +40,7 @@ export default function RootLayout({
       lang="en"
       className={`${silkscreen.variable} ${pressStart.variable}`}
     >
-      <body className="min-h-screen antialiased relative">
+      <body className="min-h-screen text-white antialiased relative">
         <div className="relative z-10">{children}</div>
       </body>
     </html>
