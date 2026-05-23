@@ -36,13 +36,13 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
   return (
     <div className="relative">
       <div className="wood-frame">
-        {/* Tiny "wood-burned" branding above the LED panel */}
+        {/* Tiny "engraved" branding above the LED panel */}
         <div className="flex items-center justify-between mb-2 px-1">
           <span
             className="text-[10px] sm:text-xs tracking-[0.35em] font-bold uppercase select-none"
             style={{
-              color: "#2a1808",
-              textShadow: "0 1px 0 rgba(255,220,180,0.18)",
+              color: "#0a1f12",
+              textShadow: "0 1px 0 rgba(180,220,190,0.18)",
             }}
           >
             ◉ NYC Subway
@@ -50,8 +50,8 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
           <span
             className="text-[10px] sm:text-xs tracking-widest uppercase select-none"
             style={{
-              color: "#2a1808",
-              textShadow: "0 1px 0 rgba(255,220,180,0.18)",
+              color: "#0a1f12",
+              textShadow: "0 1px 0 rgba(180,220,190,0.18)",
             }}
           >
             Realtime
@@ -85,14 +85,14 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
             />
             <span
               className="text-[9px] sm:text-[10px] tracking-[0.3em] font-bold uppercase select-none"
-              style={{ color: "#2a1808" }}
+              style={{ color: "#0a1f12" }}
             >
               On
             </span>
           </span>
           <span
             className="text-[9px] sm:text-[10px] tracking-widest uppercase select-none"
-            style={{ color: "#2a1808" }}
+            style={{ color: "#0a1f12" }}
           >
             MTA · GTFS-RT
           </span>
