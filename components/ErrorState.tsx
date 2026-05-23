@@ -1,0 +1,43 @@
+interface Props {
+  message: string;
+  onRetry?: () => void;
+}
+
+/**
+ * Big "service advisory" style error panel in MTA-amber so the user knows
+ * something needs attention without the page feeling broken.
+ */
+export function ErrorState({ message, onRetry }: Props) {
+  return (
+    <section
+      role="alert"
+      className="bg-mta-panel border border-mta-amber/40 rounded-lg overflow-hidden"
+    >
+      <div className="px-4 sm:px-6 py-3 border-b border-mta-amber/30 bg-black/40 flex items-center gap-3">
+        <span aria-hidden className="text-mta-amber text-xl leading-none">
+          ⚠
+        </span>
+        <h2 className="text-mta-amber uppercase text-sm sm:text-base tracking-[0.25em] font-bold">
+          Service Advisory
+        </h2>
+      </div>
+      <div className="px-6 py-10 text-center">
+        <p className="text-white text-xl sm:text-2xl font-bold uppercase mb-2">
+          Unable to load arrivals
+        </p>
+        <p className="text-mta-gray text-sm sm:text-base mb-6 max-w-lg mx-auto">
+          {message}
+        </p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="px-4 py-2 bg-mta-amber text-black font-bold uppercase tracking-wider rounded text-sm hover:bg-yellow-300 transition-colors"
+          >
+            Try again
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}

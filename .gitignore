@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+.env*.local
+.env
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+coverage/
+*.tsbuildinfo
+
+# Build artifacts and editor cruft only — everything in lib/mta/data/ IS
+# tracked (it's the generated stations catalog the app needs at build time).
