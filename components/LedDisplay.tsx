@@ -59,61 +59,17 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
         </div>
 
         <div
-          className="led-board px-5 sm:px-8 py-5 sm:py-7"
+          className="led-board px-5 sm:px-8 py-6 sm:py-8"
           aria-label={`Next trains at ${station.name}`}
         >
-          {/* Station name strip across the top */}
-          <div className="relative mb-4 sm:mb-5 flex items-center justify-between gap-3">
-            <div className="led-mask">
-              <LedText
-                color="#ffb000"
-                font="pixel"
-                size={18}
-                className="uppercase tracking-widest"
-              >
-                {station.name}
-              </LedText>
-            </div>
-            <div className="led-mask shrink-0">
-              <LedText color="#ff7a00" font="pixel" size={14}>
-                {station.borough.toUpperCase()}
-              </LedText>
-            </div>
-          </div>
-
-          {/* Two arrival rows */}
-          <div className="flex flex-col gap-4 sm:gap-6">
+          {/* Two arrival rows (uniform sizing) */}
+          <div className="flex flex-col gap-5 sm:gap-7">
             {loading || top.length === 0
               ? Array.from({ length: 2 }).map((_, i) => <SkeletonRow key={i} />)
-              : top.map((a, i) => (
-                  <LedRow key={`${a.tripId}-${a.stopId}`} arrival={a} index={i} />
+              : top.map((a) => (
+                  <LedRow key={`${a.tripId}-${a.stopId}`} arrival={a} />
                 ))}
           </div>
-
-          {/* "After" hint when we have a third train */}
-          {!loading && arrivals[2] && (
-            <div className="relative mt-5 pt-4 border-t border-white/[0.06]">
-              <div className="led-mask flex items-center gap-3">
-                <LedText
-                  color="#666"
-                  font="pixel"
-                  size={11}
-                  className="uppercase tracking-widest"
-                >
-                  After
-                </LedText>
-                <LedText color="#9aa" font="pixel" size={13}>
-                  {`${arrivals[2].routeId}`}
-                </LedText>
-                <LedText color="#9aa" font="pixel" size={13} className="truncate">
-                  {arrivals[2].destination}
-                </LedText>
-                <LedText color="#ffb000" font="pixel" size={13} className="ml-auto">
-                  {formatMinutes(arrivals[2])}
-                </LedText>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Tiny "power-on" LED + branding below the panel */}
@@ -147,10 +103,15 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
   );
 }
 
-function LedRow({ arrival, index }: { arrival: NormalizedArrival; index: number }) {
+// Uniform sizes for every arrival row, so the board reads as a single grid.
+const BULLET_SIZE = 60;
+const DEST_SIZE = 32;
+const MIN_SIZE = 30;
+const LABEL_SIZE = 11;
+
+function LedRow({ arrival }: { arrival: NormalizedArrival }) {
   const style = routeStyle(arrival.routeId);
   const isArriving = arrival.isArriving || arrival.minutesAway <= 0;
-  const isFirst = index === 0;
   // Yellow trains (N/Q/R/W) read poorly as text; use a brighter shade.
   const destColor =
     style.bg === "#FCCC0A" ? "#fff070" : brightenForLed(style.bg);
@@ -159,7 +120,7 @@ function LedRow({ arrival, index }: { arrival: NormalizedArrival; index: number 
   return (
     <div className="relative grid grid-cols-[auto_1fr_auto] items-center gap-4 sm:gap-5">
       <div className="led-mask">
-        <LedBullet route={arrival.routeId} size={isFirst ? 72 : 56} />
+        <LedBullet route={arrival.routeId} size={BULLET_SIZE} />
       </div>
 
       <div className="min-w-0">
@@ -167,7 +128,7 @@ function LedRow({ arrival, index }: { arrival: NormalizedArrival; index: number 
           <LedText
             color={destColor}
             font="pixel"
-            size={isFirst ? 38 : 30}
+            size={DEST_SIZE}
             marqueeOnOverflow
             className="block w-full"
           >
@@ -179,7 +140,7 @@ function LedRow({ arrival, index }: { arrival: NormalizedArrival; index: number 
             <LedText
               color="#888"
               font="pixel"
-              size={12}
+              size={LABEL_SIZE}
               className="uppercase tracking-widest"
             >
               {arrival.directionLabel}
@@ -192,7 +153,7 @@ function LedRow({ arrival, index }: { arrival: NormalizedArrival; index: number 
         <LedText
           color={minutesColor}
           font="pixel"
-          size={isFirst ? 34 : 28}
+          size={MIN_SIZE}
           className={isArriving ? "led-flash" : ""}
         >
           {formatMinutes(arrival)}

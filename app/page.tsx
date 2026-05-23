@@ -5,6 +5,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { LastUpdated } from "@/components/LastUpdated";
 import { LedDisplay } from "@/components/LedDisplay";
 import { StationSearch } from "@/components/StationSearch";
+import { SubwayBullet } from "@/components/SubwayBullet";
 import { getArrivalsClient, listStationsClient } from "@/lib/mta/client";
 import type { ArrivalsResponse, Station } from "@/lib/mta/types";
 
@@ -115,24 +116,42 @@ export default function HomePage() {
   const stationForDisplay = arrivals?.station ?? fallbackStation;
 
   return (
-    <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-10 sm:py-16 max-w-3xl mx-auto flex flex-col gap-10 sm:gap-12">
-      {/* Branding strip */}
-      <header className="flex items-center justify-center gap-3">
-        <span
-          aria-hidden
-          className="h-2 w-2 rounded-full bg-mta-amber amber-glow"
-        />
-        <h1 className="text-mta-amber uppercase tracking-[0.4em] text-xs sm:text-sm font-bold">
-          Subway Times
-        </h1>
-        <span
-          aria-hidden
-          className="h-2 w-2 rounded-full bg-mta-amber amber-glow"
-        />
+    <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-3xl mx-auto flex flex-col gap-8 sm:gap-10">
+      {/* Top strip: credit (left) + station info (right) */}
+      <header className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full bg-mta-amber amber-glow"
+          />
+          <p className="text-mta-gray text-[10px] sm:text-xs tracking-[0.3em] uppercase font-medium">
+            Made by Junjin Tan
+          </p>
+        </div>
+
+        {stationForDisplay ? (
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex flex-col items-end leading-none">
+              <span className="text-white font-bold uppercase text-sm sm:text-base tracking-tight">
+                {stationForDisplay.name}
+              </span>
+              <span className="text-mta-gray text-[10px] sm:text-xs tracking-widest uppercase mt-1">
+                {stationForDisplay.borough}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {stationForDisplay.routes.map((r) => (
+                <SubwayBullet key={r} route={r} size="sm" />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="h-7 w-44 bg-white/5 rounded animate-pulse" />
+        )}
       </header>
 
       {/* Hero LED sign */}
-      <section className="px-2 sm:px-6 pt-2 pb-12">
+      <section className="px-1 sm:px-4 pt-2 pb-10">
         {stationForDisplay ? (
           <LedDisplay
             station={stationForDisplay}
@@ -192,12 +211,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer credits */}
-      <footer className="mt-auto pt-10 flex flex-col items-center gap-2 text-center">
-        <p className="text-mta-gray text-[10px] sm:text-xs tracking-[0.3em] uppercase">
-          made by junjin tan
-        </p>
-        <p className="text-mta-gray/70 text-[10px] leading-relaxed max-w-md">
+      {/* Footer attribution */}
+      <footer className="mt-auto pt-8 text-center">
+        <p className="text-mta-gray/70 text-[10px] leading-relaxed max-w-md mx-auto">
           Live data:{" "}
           <a
             href="https://api.mta.info/"
