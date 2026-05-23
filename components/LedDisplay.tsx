@@ -107,7 +107,6 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
 const BULLET_SIZE = 60;
 const DEST_SIZE = 32;
 const MIN_SIZE = 30;
-const LABEL_SIZE = 11;
 
 function LedRow({ arrival }: { arrival: NormalizedArrival }) {
   const style = routeStyle(arrival.routeId);
@@ -136,15 +135,19 @@ function LedRow({ arrival }: { arrival: NormalizedArrival }) {
           </LedText>
         </div>
         {arrival.directionLabel && (
-          <div className="led-mask mt-1.5">
-            <LedText
-              color="#888"
-              font="pixel"
-              size={LABEL_SIZE}
-              className="uppercase tracking-widest"
-            >
-              {arrival.directionLabel}
-            </LedText>
+          // Direction label kept in Helvetica (not LED-masked) so the
+          // human-readable platform label stays crisp regardless of LED
+          // pitch. Subtle color so it doesn't compete with the destination.
+          <div
+            className="mt-1.5 uppercase tracking-[0.2em] font-medium"
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontSize: 11,
+              color: "#9a9a9a",
+              letterSpacing: "0.18em",
+            }}
+          >
+            {arrival.directionLabel}
           </div>
         )}
       </div>

@@ -150,6 +150,21 @@ export default function HomePage() {
         )}
       </header>
 
+      {/* Station picker (above the sign so it's the first thing users find) */}
+      <section className="flex flex-col gap-3">
+        {stationsError ? (
+          <p className="text-mta-red text-sm text-center">
+            Couldn’t load station list: {stationsError}
+          </p>
+        ) : (
+          <StationSearch
+            stations={stations}
+            selectedStationId={selectedId}
+            onSelect={handleSelect}
+          />
+        )}
+      </section>
+
       {/* Hero LED sign */}
       <section className="px-1 sm:px-4 pt-2 pb-10">
         {stationForDisplay ? (
@@ -184,31 +199,17 @@ export default function HomePage() {
         </p>
       )}
 
-      {/* Controls: station search + refresh status */}
-      <section className="flex flex-col gap-4">
-        {stationsError ? (
-          <p className="text-mta-red text-sm text-center">
-            Couldn’t load station list: {stationsError}
-          </p>
-        ) : (
-          <StationSearch
-            stations={stations}
-            selectedStationId={selectedId}
-            onSelect={handleSelect}
-          />
-        )}
-
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <LastUpdated
-            updatedAt={arrivals?.updatedAt ?? null}
-            isRefreshing={isRefreshing}
-            onRefresh={handleManualRefresh}
-            source={arrivals?.source}
-          />
-          <p className="text-mta-gray text-[11px] uppercase tracking-widest">
-            Auto-refresh · {POLL_INTERVAL_MS / 1000}s
-          </p>
-        </div>
+      {/* Status bar: live indicator + refresh */}
+      <section className="flex items-center justify-between gap-3 flex-wrap">
+        <LastUpdated
+          updatedAt={arrivals?.updatedAt ?? null}
+          isRefreshing={isRefreshing}
+          onRefresh={handleManualRefresh}
+          source={arrivals?.source}
+        />
+        <p className="text-mta-gray text-[11px] uppercase tracking-widest">
+          Auto-refresh · {POLL_INTERVAL_MS / 1000}s
+        </p>
       </section>
 
       {/* Footer attribution */}
