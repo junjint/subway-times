@@ -4,46 +4,192 @@
 
 :root {
   color-scheme: dark;
+
+  /* LED matrix tuning. Adjust --led-pitch to scale the whole effect.
+   * Dot/pitch ratio of ~0.75 gives a generous LED face with a clear gap
+   * between dots, matching real RGB matrix panels. */
+  --led-pitch: 4px;
+  --led-dot: 3px;
 }
 
 html,
 body {
-  background-color: #0a0a0a;
+  background: radial-gradient(circle at 50% 0%, #1a1208 0%, #050505 70%);
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
+  min-height: 100vh;
 }
 
-/*
- * Subtle vertical "scanline" texture to evoke an LED matrix without being
- * distracting. Applied only to the body so individual panels stay crisp.
- */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.012) 0px,
-    rgba(255, 255, 255, 0.012) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  z-index: 1;
-}
-
-/*
- * Smooth amber LED glow on numbers without hurting legibility.
- */
 .amber-glow {
   text-shadow:
     0 0 4px rgba(255, 176, 0, 0.45),
     0 0 12px rgba(255, 176, 0, 0.18);
 }
 
-/* Hide native scrollbar styling on the dropdown to keep the dark theme clean */
+/* ============================================================ */
+/* LED MATRIX                                                   */
+/* ============================================================ */
+
+/*
+ * `.led-mask` discretizes any child content into a grid of glowing dots.
+ *
+ * Trick: a 2-layer mask. The first layer is a radial-gradient where only the
+ * center of each cell is opaque (the LED itself), everything else is masked
+ * out. This makes anything underneath - text, gradients, shapes - render as
+ * an LED matrix. The pixel-font already snaps to a grid, so the dots line
+ * up cleanly with character pixels.
+ *
+ * The `-webkit-mask-*` duplicates are required for Safari.
+ */
+.led-mask {
+  /* Solid LED face, hard edge transition for crisp dots. */
+  -webkit-mask-image: radial-gradient(
+    circle,
+    #000 calc(var(--led-dot) / 2),
+    transparent calc(var(--led-dot) / 2 + 0.5px)
+  );
+  mask-image: radial-gradient(
+    circle,
+    #000 calc(var(--led-dot) / 2),
+    transparent calc(var(--led-dot) / 2 + 0.5px)
+  );
+  -webkit-mask-size: var(--led-pitch) var(--led-pitch);
+  mask-size: var(--led-pitch) var(--led-pitch);
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  /* Brightness boost so dots that pass through the mask glow more */
+  filter: brightness(1.15) saturate(1.2);
+}
+
+/*
+ * `.led-board` is the matte black PCB substrate visible in real LED signs.
+ * The faint dot grid is the LEDs in their off state. We also paint a very
+ * subtle bottom gradient because real signs glow more brightly under load.
+ */
+.led-board {
+  background-color: #060708;
+  background-image:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.045) 0,
+      rgba(255, 255, 255, 0.045) calc(var(--led-dot) / 2),
+      transparent calc(var(--led-dot) / 2 + 0.5px)
+    );
+  background-size: var(--led-pitch) var(--led-pitch);
+  background-position: 0 0;
+  background-repeat: repeat;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 0 1px 8px rgba(0, 0, 0, 0.9);
+}
+
+/* Soft vignette + tiny glass-reflection sheen */
+.led-board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 25%);
+}
+
+.led-glow {
+  filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 4px currentColor);
+}
+
+/* ============================================================ */
+/* WOODEN FRAME                                                 */
+/* ============================================================ */
+
+.wood-frame {
+  position: relative;
+  border-radius: 14px;
+  padding: 22px;
+  background:
+    linear-gradient(135deg, #6b4423 0%, #8b5a2b 25%, #6b4423 50%, #5a3818 75%, #4a2f15 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 10px 20px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Subtle grain via layered gradients - cheaper than a noise SVG */
+.wood-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 3px,
+      rgba(0, 0, 0, 0.04) 3px,
+      rgba(0, 0, 0, 0.04) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 13px,
+      rgba(40, 20, 5, 0.08) 13px,
+      rgba(40, 20, 5, 0.08) 14px
+    );
+  mix-blend-mode: multiply;
+}
+
+/* Ambient underglow that bleeds onto the "shelf" below the sign */
+.underglow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -36px;
+  height: 64px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255, 60, 60, 0.55), transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(40, 100, 255, 0.55), transparent 60%);
+  filter: blur(18px);
+  opacity: 0.85;
+  border-radius: 50%;
+  animation: underglow-shift 12s ease-in-out infinite;
+}
+
+@keyframes underglow-shift {
+  0%, 100% { transform: translateX(-3%); }
+  50% { transform: translateX(3%); }
+}
+
+/* Pulsing "Arriving" text */
+@keyframes led-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.led-flash {
+  animation: led-flash 0.9s ease-in-out infinite;
+}
+
+/* Horizontal scroll for destinations that overflow the LED width */
+@keyframes led-marquee {
+  0%, 8% { transform: translateX(0); }
+  92%, 100% { transform: translateX(calc(-1 * var(--marquee-distance, 0px))); }
+}
+.led-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: led-marquee var(--marquee-duration, 8s) ease-in-out infinite;
+}
+
+/* Thin scrollbar inside the dropdown */
 .thin-scroll::-webkit-scrollbar {
   width: 8px;
 }

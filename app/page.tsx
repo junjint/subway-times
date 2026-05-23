@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrivalBoard } from "@/components/ArrivalBoard";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ErrorState } from "@/components/ErrorState";
 import { LastUpdated } from "@/components/LastUpdated";
-import { LoadingState } from "@/components/LoadingState";
-import { StationHeader } from "@/components/StationHeader";
+import { LedDisplay } from "@/components/LedDisplay";
 import { StationSearch } from "@/components/StationSearch";
 import { getArrivalsClient, listStationsClient } from "@/lib/mta/client";
 import type { ArrivalsResponse, Station } from "@/lib/mta/types";
@@ -27,7 +25,6 @@ export default function HomePage() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchSeqRef = useRef(0);
 
-  // --- Load station catalog once on mount ---
   useEffect(() => {
     try {
       setStations(listStationsClient());
@@ -38,38 +35,31 @@ export default function HomePage() {
     }
   }, []);
 
-  // Restore from localStorage (only after stations loaded so we can validate)
   useEffect(() => {
     if (stations.length === 0) return;
     let initial = DEFAULT_STATION_ID;
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored && stations.some((s) => s.gtfsStopId === stored)) {
-        initial = stored;
-      }
+      if (stored && stations.some((s) => s.gtfsStopId === stored)) initial = stored;
     } catch {
-      // localStorage may throw in private mode; ignore
+      /* ignore */
     }
     setSelectedId(initial);
   }, [stations]);
 
-  // --- Fetch arrivals for the selected station ---
   const fetchArrivals = useCallback(
     async (stationId: string, opts: { silent?: boolean } = {}) => {
       const seq = ++fetchSeqRef.current;
       if (opts.silent) setIsRefreshing(true);
       else setIsLoading(true);
       setArrivalsError(null);
-
       try {
         const data = await getArrivalsClient(stationId);
-        // Discard out-of-order responses (user switched stations mid-flight)
         if (seq !== fetchSeqRef.current) return;
         setArrivals(data);
       } catch (err) {
         if (seq !== fetchSeqRef.current) return;
-        const msg = err instanceof Error ? err.message : "Failed to load arrivals";
-        setArrivalsError(msg);
+        setArrivalsError(err instanceof Error ? err.message : "Failed to load arrivals");
       } finally {
         if (seq === fetchSeqRef.current) {
           setIsLoading(false);
@@ -80,23 +70,19 @@ export default function HomePage() {
     [],
   );
 
-  // --- Wire up polling whenever the selected station changes ---
   useEffect(() => {
     if (!selectedId) return;
     setArrivals(null);
     fetchArrivals(selectedId);
-
     if (pollRef.current) clearInterval(pollRef.current);
     pollRef.current = setInterval(() => {
       fetchArrivals(selectedId, { silent: true });
     }, POLL_INTERVAL_MS);
-
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [selectedId, fetchArrivals]);
 
-  // --- Pause polling when tab is hidden, refresh on resume ---
   useEffect(() => {
     function onVis() {
       if (document.visibilityState === "visible" && selectedId) {
@@ -120,94 +106,108 @@ export default function HomePage() {
     if (selectedId) fetchArrivals(selectedId, { silent: true });
   }, [selectedId, fetchArrivals]);
 
+  // Build a stable Station to render while loading or when arrivals null
+  const fallbackStation = useMemo(
+    () => stations.find((s) => s.gtfsStopId === selectedId) ?? null,
+    [stations, selectedId],
+  );
+
+  const stationForDisplay = arrivals?.station ?? fallbackStation;
+
   return (
-    <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-6 sm:py-10 max-w-5xl mx-auto flex flex-col gap-6 sm:gap-8">
-      {/* Top bar — branding + search */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div
-              aria-hidden
-              className="h-3 w-3 rounded-full bg-mta-amber amber-glow"
-            />
-            <span className="text-mta-amber uppercase tracking-[0.3em] text-xs font-bold">
-              Subway Screen
-            </span>
-          </div>
-          <p className="text-mta-gray text-xs sm:text-sm mt-1">
-            NYC MTA platform countdown · powered by GTFS-Realtime
-          </p>
-        </div>
-        <div className="w-full sm:max-w-md">
-          {stationsError ? (
-            <p className="text-mta-red text-sm">
-              Couldn’t load station list: {stationsError}
-            </p>
-          ) : (
-            <StationSearch
-              stations={stations}
-              selectedStationId={selectedId}
-              onSelect={handleSelect}
-            />
-          )}
-        </div>
-      </div>
+    <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-10 sm:py-16 max-w-3xl mx-auto flex flex-col gap-10 sm:gap-12">
+      {/* Branding strip */}
+      <header className="flex items-center justify-center gap-3">
+        <span
+          aria-hidden
+          className="h-2 w-2 rounded-full bg-mta-amber amber-glow"
+        />
+        <h1 className="text-mta-amber uppercase tracking-[0.4em] text-xs sm:text-sm font-bold">
+          Subway Times
+        </h1>
+        <span
+          aria-hidden
+          className="h-2 w-2 rounded-full bg-mta-amber amber-glow"
+        />
+      </header>
 
-      {/* Main board */}
-      <div className="flex flex-col gap-4">
-        {arrivals ? (
-          <>
-            <StationHeader station={arrivals.station} />
-            {arrivals.warning && (
-              <div className="bg-mta-red/15 border border-mta-red/50 rounded px-4 py-3 text-mta-red text-sm">
-                <strong className="uppercase tracking-wider mr-2">Notice:</strong>
-                {arrivals.warning}
-              </div>
-            )}
-            <ArrivalBoard data={arrivals} />
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <LastUpdated
-                updatedAt={arrivals.updatedAt}
-                isRefreshing={isRefreshing}
-                onRefresh={handleManualRefresh}
-                source={arrivals.source}
-              />
-              <p className="text-mta-gray text-xs">
-                Auto-refreshing every {POLL_INTERVAL_MS / 1000} seconds
-              </p>
-            </div>
-          </>
-        ) : isLoading || !selectedId ? (
-          <>
-            <div className="h-16 bg-white/5 rounded animate-pulse" />
-            <LoadingState />
-          </>
-        ) : arrivalsError ? (
-          <ErrorState
-            message={arrivalsError}
-            onRetry={() => selectedId && fetchArrivals(selectedId)}
+      {/* Hero LED sign */}
+      <section className="px-2 sm:px-6 pt-2 pb-12">
+        {stationForDisplay ? (
+          <LedDisplay
+            station={stationForDisplay}
+            arrivals={arrivals?.arrivals ?? []}
+            loading={isLoading || !arrivals}
           />
-        ) : null}
-
-        {arrivalsError && arrivals && (
-          <p className="text-mta-red text-xs">
-            Last refresh failed: {arrivalsError}. Showing previous data.
-          </p>
+        ) : (
+          <div className="h-48 wood-frame">
+            <div className="led-board h-full" />
+          </div>
         )}
-      </div>
+      </section>
 
-      <footer className="mt-auto pt-8 text-mta-gray text-[11px] sm:text-xs leading-relaxed">
-        <p>
-          Data: Metropolitan Transportation Authority (MTA){" "}
+      {/* Optional fallback / error warnings */}
+      {arrivals?.warning && (
+        <div className="bg-mta-red/15 border border-mta-red/50 rounded px-4 py-3 text-mta-red text-sm text-center">
+          <strong className="uppercase tracking-wider mr-2">Notice:</strong>
+          {arrivals.warning}
+        </div>
+      )}
+      {arrivalsError && !arrivals && (
+        <ErrorState
+          message={arrivalsError}
+          onRetry={() => selectedId && fetchArrivals(selectedId)}
+        />
+      )}
+      {arrivalsError && arrivals && (
+        <p className="text-mta-red text-xs text-center">
+          Last refresh failed: {arrivalsError}. Showing previous data.
+        </p>
+      )}
+
+      {/* Controls: station search + refresh status */}
+      <section className="flex flex-col gap-4">
+        {stationsError ? (
+          <p className="text-mta-red text-sm text-center">
+            Couldn’t load station list: {stationsError}
+          </p>
+        ) : (
+          <StationSearch
+            stations={stations}
+            selectedStationId={selectedId}
+            onSelect={handleSelect}
+          />
+        )}
+
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <LastUpdated
+            updatedAt={arrivals?.updatedAt ?? null}
+            isRefreshing={isRefreshing}
+            onRefresh={handleManualRefresh}
+            source={arrivals?.source}
+          />
+          <p className="text-mta-gray text-[11px] uppercase tracking-widest">
+            Auto-refresh · {POLL_INTERVAL_MS / 1000}s
+          </p>
+        </div>
+      </section>
+
+      {/* Footer credits */}
+      <footer className="mt-auto pt-10 flex flex-col items-center gap-2 text-center">
+        <p className="text-mta-gray text-[10px] sm:text-xs tracking-[0.3em] uppercase">
+          made by junjin tan
+        </p>
+        <p className="text-mta-gray/70 text-[10px] leading-relaxed max-w-md">
+          Live data:{" "}
           <a
             href="https://api.mta.info/"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-white"
           >
-            GTFS-Realtime
+            MTA GTFS-Realtime
           </a>{" "}
-          and{" "}
+          ·{" "}
           <a
             href="https://data.ny.gov/Transportation/MTA-Subway-Stations/39hk-dx4f"
             target="_blank"
@@ -215,9 +215,8 @@ export default function HomePage() {
             className="underline hover:text-white"
           >
             MTA Subway Stations
-          </a>{" "}
-          open data. Not affiliated with the MTA. Service may differ from
-          posted schedule.
+          </a>
+          . Not affiliated with the MTA.
         </p>
       </footer>
     </main>

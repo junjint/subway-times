@@ -25,6 +25,8 @@ const config: Config = {
           "Consolas",
           "monospace",
         ],
+        pixel: ["var(--font-silkscreen)", "'Silkscreen'", "monospace"],
+        chunky: ["var(--font-press-start)", "'Press Start 2P'", "monospace"],
       },
       colors: {
         // Official MTA subway route colors
