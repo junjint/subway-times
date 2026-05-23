@@ -41,8 +41,8 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
           <span
             className="text-[10px] sm:text-xs tracking-[0.35em] font-bold uppercase select-none"
             style={{
-              color: "#0a1f12",
-              textShadow: "0 1px 0 rgba(180,220,190,0.18)",
+              color: "#f5f5f5",
+              textShadow: "0 1px 0 rgba(0,0,0,0.5)",
             }}
           >
             ◉ NYC Subway
@@ -50,8 +50,8 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
           <span
             className="text-[10px] sm:text-xs tracking-widest uppercase select-none"
             style={{
-              color: "#0a1f12",
-              textShadow: "0 1px 0 rgba(180,220,190,0.18)",
+              color: "#f5f5f5",
+              textShadow: "0 1px 0 rgba(0,0,0,0.5)",
             }}
           >
             Realtime
@@ -85,14 +85,20 @@ export function LedDisplay({ station, arrivals, loading }: Props) {
             />
             <span
               className="text-[9px] sm:text-[10px] tracking-[0.3em] font-bold uppercase select-none"
-              style={{ color: "#0a1f12" }}
+              style={{
+                color: "#f5f5f5",
+                textShadow: "0 1px 0 rgba(0,0,0,0.5)",
+              }}
             >
               On
             </span>
           </span>
           <span
             className="text-[9px] sm:text-[10px] tracking-widest uppercase select-none"
-            style={{ color: "#0a1f12" }}
+            style={{
+              color: "#f5f5f5",
+              textShadow: "0 1px 0 rgba(0,0,0,0.5)",
+            }}
           >
             MTA · GTFS-RT
           </span>

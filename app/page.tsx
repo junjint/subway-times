@@ -118,13 +118,17 @@ export default function HomePage() {
   return (
     <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-3xl mx-auto flex flex-col gap-8 sm:gap-10">
       {/* Top strip: credit (left) + station info (right) */}
-      <header className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b border-white/[0.06]">
+      <header className="flex items-center justify-between gap-4 flex-wrap pb-4 border-b border-black/10">
         <div className="flex items-center gap-2.5">
           <span
             aria-hidden
-            className="h-1.5 w-1.5 rounded-full bg-mta-amber amber-glow"
+            className="h-1.5 w-1.5 rounded-full"
+            style={{
+              backgroundColor: "#14271b",
+              boxShadow: "0 0 4px rgba(20,39,27,0.4)",
+            }}
           />
-          <p className="text-mta-gray text-[10px] sm:text-xs tracking-[0.3em] uppercase font-medium">
+          <p className="text-neutral-600 text-[10px] sm:text-xs tracking-[0.3em] uppercase font-medium">
             Made by Junjin Tan
           </p>
         </div>
@@ -132,10 +136,10 @@ export default function HomePage() {
         {stationForDisplay ? (
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="flex flex-col items-end leading-none">
-              <span className="text-white font-bold uppercase text-sm sm:text-base tracking-tight">
+              <span className="text-neutral-900 font-bold uppercase text-sm sm:text-base tracking-tight">
                 {stationForDisplay.name}
               </span>
-              <span className="text-mta-gray text-[10px] sm:text-xs tracking-widest uppercase mt-1">
+              <span className="text-neutral-500 text-[10px] sm:text-xs tracking-widest uppercase mt-1">
                 {stationForDisplay.borough}
               </span>
             </div>
@@ -146,7 +150,7 @@ export default function HomePage() {
             </div>
           </div>
         ) : (
-          <div className="h-7 w-44 bg-white/5 rounded animate-pulse" />
+          <div className="h-7 w-44 bg-black/5 rounded animate-pulse" />
         )}
       </header>
 
@@ -182,7 +186,7 @@ export default function HomePage() {
 
       {/* Optional fallback / error warnings */}
       {arrivals?.warning && (
-        <div className="bg-mta-red/15 border border-mta-red/50 rounded px-4 py-3 text-mta-red text-sm text-center">
+        <div className="bg-red-50 border border-red-300 rounded px-4 py-3 text-red-700 text-sm text-center">
           <strong className="uppercase tracking-wider mr-2">Notice:</strong>
           {arrivals.warning}
         </div>
@@ -194,7 +198,7 @@ export default function HomePage() {
         />
       )}
       {arrivalsError && arrivals && (
-        <p className="text-mta-red text-xs text-center">
+        <p className="text-red-700 text-xs text-center">
           Last refresh failed: {arrivalsError}. Showing previous data.
         </p>
       )}
@@ -207,20 +211,20 @@ export default function HomePage() {
           onRefresh={handleManualRefresh}
           source={arrivals?.source}
         />
-        <p className="text-mta-gray text-[11px] uppercase tracking-widest">
+        <p className="text-neutral-500 text-[11px] uppercase tracking-widest">
           Auto-refresh · {POLL_INTERVAL_MS / 1000}s
         </p>
       </section>
 
       {/* Footer attribution */}
       <footer className="mt-auto pt-8 text-center">
-        <p className="text-mta-gray/70 text-[10px] leading-relaxed max-w-md mx-auto">
+        <p className="text-neutral-500 text-[10px] leading-relaxed max-w-md mx-auto">
           Live data:{" "}
           <a
             href="https://api.mta.info/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-white"
+            className="underline hover:text-neutral-900"
           >
             MTA GTFS-Realtime
           </a>{" "}
@@ -229,7 +233,7 @@ export default function HomePage() {
             href="https://data.ny.gov/Transportation/MTA-Subway-Stations/39hk-dx4f"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-white"
+            className="underline hover:text-neutral-900"
           >
             MTA Subway Stations
           </a>

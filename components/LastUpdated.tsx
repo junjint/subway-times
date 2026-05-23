@@ -39,20 +39,20 @@ export function LastUpdated({ updatedAt, isRefreshing, onRefresh, source }: Prop
   const isFallback = source === "fallback";
 
   return (
-    <div className="flex items-center gap-3 text-xs sm:text-sm text-mta-gray">
+    <div className="flex items-center gap-3 text-xs sm:text-sm text-neutral-600">
       <span className="inline-flex items-center gap-2">
         <span
           className={clsx(
             "h-2 w-2 rounded-full",
             isFallback
-              ? "bg-mta-red"
+              ? "bg-red-500"
               : isRefreshing
-              ? "bg-mta-amber animate-pulse"
-              : "bg-mta-green",
+              ? "bg-amber-500 animate-pulse"
+              : "bg-emerald-600",
           )}
           aria-hidden
         />
-        <span className="uppercase tracking-wider">
+        <span className="uppercase tracking-wider font-medium text-neutral-700">
           {isFallback ? "Demo data" : "Live"}
         </span>
       </span>
@@ -62,7 +62,7 @@ export function LastUpdated({ updatedAt, isRefreshing, onRefresh, source }: Prop
         onClick={onRefresh}
         disabled={isRefreshing}
         className={clsx(
-          "ml-1 px-2.5 py-1 rounded border border-white/10 text-white hover:bg-white/5 transition-colors text-xs uppercase tracking-wider",
+          "ml-1 px-2.5 py-1 rounded border border-neutral-300 text-neutral-900 hover:bg-neutral-100 transition-colors text-xs uppercase tracking-wider",
           isRefreshing && "opacity-60 cursor-wait",
         )}
         aria-label="Refresh arrivals now"
